@@ -121,3 +121,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+#vscode
+.vscode/
+
+#serverless
+*.yml
+*.evt
