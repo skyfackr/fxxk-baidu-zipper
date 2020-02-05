@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 import logging
+from .mainfunc import mainfunc
+from .ossmiddleware import ossMiddleware
 
 # if you open the initializer feature, please implement the initializer function, as below:
-# def initializer(context):
-#   logger = logging.getLogger()
-#   logger.info('initializing')
-
 def handler(event, context):
+  raise RuntimeError('not finished')
   logger = logging.getLogger()
   logger.info('hello world')
   return 'hello world'
+
+OSSMW=None
+def init(context):
+  global OSSMW
+  OSSMW=ossMiddleware(context.credentials.accessKeyId,context.credentials.accessKeySecret,context.credentials.securityToken)
