@@ -16,18 +16,20 @@ class fileLikeTranslationMixin(streamReaderMixiner):
         '''
         self.__filelike_read_data=text
         self.__length=len(text)
+        self.__flush_needed=False
         return
         
     @with_goto
     def read(self,num:int=None):
         label .reset
+        self.__flush_needed=False
         nowstr=self.__filelike_read_data
         if num==None:
             num=self.__length
         now=0
         last=num
         while True:
-            if self.__filelike_read_data!=nowstr:
+            if self.__filelike_read_data!=nowstr or self.__flush_needed==True:
                 goto .reset
             if now>=self.__length:
                 yield None
@@ -42,6 +44,13 @@ class fileLikeTranslationMixin(streamReaderMixiner):
         将filelike转换为字符串
         '''
         return str(self._streamRead(obj))
+
+    def flush_read(self):
+        '''
+        直接刷新read读取坐标至开头
+        '''
+        self.__flush_needed=True
+        return
 
 
 
