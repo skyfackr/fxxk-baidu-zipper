@@ -8,7 +8,14 @@ class globalEnv():
     获取全局环境变量
     '''
     #允许使用的变量名称
-    __Member__=['OSSBucketName','allow_zip_mode','allow_unzip_mode','support_zipfile_class']
+    __Member__=['OSSBucketName',
+    'allow_zip_mode',
+    'allow_unzip_mode',
+    'support_encrypt_class',
+    'OSSMaxinumDownload',
+    'OSSMaxinumUpload',
+    'OSSDownloadThread',
+    'OSSUploadThread']
     #直接输出的常量名，若不在此字典则读取系统环境变量，要求名称必须在__Member__中
     __envStaticMember={}
     def isMenber(self,name):
