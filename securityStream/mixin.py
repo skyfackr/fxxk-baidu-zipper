@@ -4,7 +4,9 @@
 '''
 from Crypto.Cipher import AES
 import logging
-class fileLikeTranslationMixin():
+from goto import with_goto
+from ..ossmiddleware.streamReaderMixin import streamReaderMixiner
+class fileLikeTranslationMixin(streamReaderMixiner):
     '''
     用于将filelike完全读取或者将字符串转为filelike的mixin
     '''
@@ -15,13 +17,18 @@ class fileLikeTranslationMixin():
         self.__filelike_read_data=text
         self.__length=len(text)
         return
-
+        
+    @with_goto
     def read(self,num:int=None):
+        label .reset
+        nowstr=self.__filelike_read_data
         if num==None:
             num=self.__length
         now=0
         last=num
         while True:
+            if self.__filelike_read_data!=nowstr:
+                goto .reset
             if now>=self.__length:
                 yield None
             yield self.__filelike_read_data[now:last]
@@ -34,7 +41,7 @@ class fileLikeTranslationMixin():
         '''
         将filelike转换为字符串
         '''
-        return str(obj.read())
+        return str(self._streamRead(obj))
 
 
 
