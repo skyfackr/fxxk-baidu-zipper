@@ -31,6 +31,9 @@ class fileLikeTranslationMixin(streamReaderMixiner):
         while True:
             if self.__filelike_read_data!=nowstr or self.__flush_needed==True:
                 goto .reset
+            if num==self.__length:
+                yield self.__filelike_read_data
+                continue
             if now>=self.__length:
                 yield None
             yield self.__filelike_read_data[now:last]
