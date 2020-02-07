@@ -8,9 +8,11 @@ from ..zipStream import compresser
 import logging
 from ..securityStream.mixin import fileLikeTranslationMixin
 
-def file_decode(data,password:str=None):
+def file_encode(data,password:str=None):
     '''
     封装函数
+
+    返回两个参数，第一个为数据，第二个为压缩时间
 
     :param data:数据
 

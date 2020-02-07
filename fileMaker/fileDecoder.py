@@ -17,6 +17,8 @@ class VerificationError(Exception):
 def decoder(all_data:str,password):
     '''
     解封装数据
+
+    返回5个数据，依次为原数据，是否加密，原数据，加密前数据（如果存在），解压时间
     '''
     #提取总校验
     try:
