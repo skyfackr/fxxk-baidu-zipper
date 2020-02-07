@@ -38,7 +38,6 @@ ps:凡是''单引号括起的为在结构里的字符，其他则是名称，单
 }
 
 msg详细格式：
-1. compress/decompress
    1. 失败：
         {
             'errcode':(str)错误唯一代号
@@ -58,3 +57,5 @@ OSSDownloadError:oss下载至服务器错误
 OSSUploadError:上传至服务器错误
 FileTypeError:文件格式不受支持
 VerifactionError:验证失败
+ParameterError:参数错误
+UnknownError:未知错误
