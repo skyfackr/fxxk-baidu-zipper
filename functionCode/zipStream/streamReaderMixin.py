@@ -6,10 +6,12 @@ class streamReaderMixiner():
     '''
     流式读取mixin
     '''
-    def _streamRead(self,data,num=1):
+    def _streamRead(self,data,num=None):
         '''
         流式读取
         '''
+        if num==None:
+            return data.read()
         ans=''
         while True:
             tmp=data.read(num)

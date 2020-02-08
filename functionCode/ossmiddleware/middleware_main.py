@@ -23,12 +23,12 @@ class ossMiddleware(streamReaderMixiner):
         self.__bucket=bucket
         self.__endpoint=endpoint
         auth=oss2.StsAuth(id,secret,token,auth_version=oss2.AUTH_VERSION_2)
-        oss2.set_stream_logger(level=logging.INFO)
+        oss2.set_stream_logger(level=logging.WARNING)
         self.__client=oss2.Bucket(auth,endpoint,bucket)
         logging.info('link oss complete,bucket:{},endpoint:{}'.format(bucket,endpoint))
         return
 
-    def download(self,filepath,maxinum_try=globalEnv.OSSMaxinumDownload,threads=globalEnv.OSSDownloadThread):
+    def download(self,filepath,maxinum_try=int(globalEnv.OSSMaxinumDownload),threads=int(globalEnv.OSSDownloadThread)):
         '''
         下载文件
         '''
@@ -40,7 +40,7 @@ class ossMiddleware(streamReaderMixiner):
             trytime+=1
             logging.info('start download {} for {} time'.format(filepath,trytime))
             try:
-                oss2.resumable_download(self.__bucket,filepath,tmpname,num_threads=threads)
+                oss2.resumable_download(self.__client,filepath,tmpname,num_threads=threads)
             except Exception as e:
                 etype,evalue,emsg=sys.exc_info()
                 logging.warn('download {} failed at {} time:{}'.format(filepath,trytime,json.dumps({
@@ -57,15 +57,14 @@ class ossMiddleware(streamReaderMixiner):
         if not os.path.exists(tmpname):
             logging.error('cannot find downloaded file!')
             raise self.errors.DownloadError('Interal error')
-        fp=open(tmpname,'rb+')
-        data=fp.read()
-        fp.close()
+        with open(tmpname,'rb') as fp:
+            data=fp.read()
         os.remove(tmpname)
         return data
 
 
 
-    def upload(self,filedata,filename,maxinum_try=globalEnv.OSSMaxinumUpload,threads=globalEnv.OSSUploadThread):
+    def upload(self,filedata,filename,maxinum_try=int(globalEnv.OSSMaxinumUpload),threads=int(globalEnv.OSSUploadThread)):
         '''
         上传文件
         '''
@@ -81,7 +80,7 @@ class ossMiddleware(streamReaderMixiner):
             trytime+=1
             logging.info('start upload {} for {} time'.format(filename,trytime))
             try:
-                oss2.resumable_upload(self.__bucket,filename,tmp.name(),num_threads=threads)
+                oss2.resumable_upload(self.__client,filename,tmp.name,num_threads=threads)
             except Exception as e:
                 etype,evalue,emsg=sys.exc_info()
                 logging.warn('upload {} failed at {} time:{}'.format(filename,trytime,json.dumps({

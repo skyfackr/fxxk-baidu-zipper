@@ -5,7 +5,7 @@
 from .finallyFileEncoder import encoder
 from ..securityStream import AESEncryptStream
 from ..zipStream import compresser
-import logging
+import logging,tempfile
 from ..securityStream.mixin import fileLikeTranslationMixin
 
 def file_encode(data,password:str=None):
@@ -23,13 +23,17 @@ def file_encode(data,password:str=None):
     if password!=None:
         is_enc=True
     #压缩
-    dataobj=fileLikeTranslationMixin()
-    dataobj._setFilelikeReading(data)
-    benc_data,compress_time=compresser(dataobj).get()
+    benc_data,compress_time=compresser(data).get()
     if not is_enc:
         fin_data=benc_data
         benc_data=None
     else:
-        fin_data=AESEncryptStream(benc_data,password).read()
-    all_data=encoder(fin_data,is_enc,data,benc_data)
+        tmp=tempfile.NamedTemporaryFile(mode='rb+')
+        tmp.write(data)
+        tmp.flush()
+        tmp.seek(0)
+        del data
+        gen=AESEncryptStream(benc_data,password).read()
+        fin_data=gen.__next__()
+    all_data=encoder(fin_data,is_enc,tmp.read(),benc_data)
     return all_data,compress_time

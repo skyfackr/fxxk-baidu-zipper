@@ -7,32 +7,7 @@ from ..ossmiddleware import ossMiddleware
 import logging,json
 from ..fileMaker import encoder
 from Crypto.Hash import SHA256
-def __failedReturnMaker(errcode,errmsg):
-    '''
-    失败时生成返回信息
-    '''
-    return {
-        'success':False,
-        'msg':{
-            'errcode':str(errcode),
-            'errmsg':str(errmsg)
-        }
-    }
-
-
-def __successReturnMaker(time,path,sha256):
-    '''
-    成功时返回成功信息
-    '''
-    return {
-        'success':True,
-        'msg':{
-            'time':int(time),
-            'path':str(path),
-            'sha256':str(sha256)
-        }
-    }
-
+from .returnMaker import __failedReturnMaker,__successReturnMaker
 
 def compress(download_path,upload_path,password=None):
     '''
@@ -44,7 +19,7 @@ def compress(download_path,upload_path,password=None):
     }))
     OSSMW:ossMiddleware=globalEnv.OSSMW
     try:
-        logging.info('starting download file:{}')
+        logging.info('starting download file:{}'.format(download_path))
         res_data=OSSMW.download(download_path)
     except ossMiddleware.errors.DownloadError as e:
         logging.warn('download error:'+str(e))

@@ -4,14 +4,19 @@
 '''
 from .streamReaderMixin import streamReaderMixiner
 import pylzma,time,logging
+from ..globalEnvironmention import globalEnv
 class compresser(streamReaderMixiner):
     '''
         流式压缩
         '''
-    def __init__(self,file_object):
+    def __init__(self,file_object,fastBytes:int=int(globalEnv.fastBytes)):
         
         self.__fileObj=file_object
-        self.__zipper=pylzma.compressfile(file_object,fastBytes=255,eos=True)
+        self.__fb=fastBytes
+        try:
+            self.__file=file_object.read()
+        except AttributeError:
+            self.__file=file_object
         return
     
     def get(self):
@@ -22,7 +27,7 @@ class compresser(streamReaderMixiner):
         '''
         logging.info('start compressing')
         start_time=time.time()
-        data=self._streamRead(self.__zipper)
+        data=pylzma.compress(self.__file,fastBytes=self.__fb,eos=True)
         end_time=time.time()
         logging.info('compress complete,use time:{}'.format(end_time-start_time))
         return data,end_time-start_time

@@ -3,7 +3,7 @@
 @des:应用分发器
 '''
 from .actions import compress,decompress
-import json
+import json,demjson,logging
 from .globalEnvironmention import globalEnv
 def __failedReturnMaker(errcode,errmsg):
     '''
@@ -35,7 +35,8 @@ def switch(event:dict):
     if not 'password' in event.keys():
         event['password']=None
     #应用测试
-    allowed_modes=json.loads(str(globalEnv.support_mode))[0]
+    #logging.warn(str(globalEnv.support_mode))
+    allowed_modes=demjson.decode(str(globalEnv.support_mode))
     if (not event['mode'] in actions_lambda.keys()) or (not event['mode'] in allowed_modes):
         return __failedReturnMaker('ParameterError','invaild mode')
     return actions_lambda[event['mode']](event['resource_file_path'],event['save_file_path'],event['password'])

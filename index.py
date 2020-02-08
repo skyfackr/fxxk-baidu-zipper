@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import logging,json,sys,traceback
-from .mainfunc import mainfunc
-from .ossmiddleware import ossMiddleware
-from .globalEnvironmention import globalEnv
+from functionCode.mainfunc import mainfunc
+from functionCode.ossmiddleware import ossMiddleware
+from functionCode.globalEnvironmention import globalEnv
 
 # if you open the initializer feature, please implement the initializer function, as below:
 
@@ -20,7 +20,6 @@ def init(context):
 
 
 def handler(event, context):
-  raise RuntimeError('not finished')
   logging.info('request arrived:'+json.dumps({
     'instanceID':globalEnv.instanceID,
     'requestID':context.requestId,
@@ -42,9 +41,9 @@ def handler(event, context):
         'errmsg':'An unknown error has occured.Please contact us with your uuid below.'
       },
       'uuid':context.requestId
-    })
+    },sort_keys=True)
   if type(ans)==dict and 'success' in ans.keys() and 'msg' in ans.keys():
     ans['uuid']=context.requestId
-  ans=json.dumps(ans,sort_keys=True)
+  ans=json.dumps(ans,sort_keys=True,ensure_ascii=False)
   logging.info('returned msg:'+ans)
   return ans

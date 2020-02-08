@@ -128,3 +128,5 @@ dmypy.json
 #serverless
 *.yml
 *.evt
+.fun/
+Funfile

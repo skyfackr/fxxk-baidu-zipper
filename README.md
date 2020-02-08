@@ -7,6 +7,7 @@
  third-party package needed:
  1. goto-statement
  2. pylzma
+ 3. demjson
 
 
 <h2>文件结构示例</h2>

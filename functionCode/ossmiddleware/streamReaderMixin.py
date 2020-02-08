@@ -10,6 +10,8 @@ class streamReaderMixiner():
         '''
         流式读取
         '''
+        if num==None:
+            return data.read()
         ans=''
         while True:
             tmp=data.read(num)

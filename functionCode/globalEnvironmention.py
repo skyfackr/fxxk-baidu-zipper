@@ -19,7 +19,9 @@ class __GLOBALENV():
     'Version',
     'support_mode',
     'OSSMW',
-    'instanceID']
+    'instanceID',
+    'OSSEndpoint',
+    'fastBytes']
     #直接输出的常量名，若不在此字典则读取系统环境变量，要求名称必须在__Member__中
     __envStaticMember={}
     @classmethod
@@ -34,21 +36,22 @@ class __GLOBALENV():
     @classmethod
     def __getattr__(self,name):
         logger=logging.getLogger()
-        logger.info('get env:{}'.format(str(name)))
+        logger.debug('get env:{}'.format(str(name)))
         if not self.isMember(name):
             raise AttributeError('OS Env have no attribute called {}'.format(name))
         if name in self.__envStaticMember.keys():
             return self.__envStaticMember[name]
         return os.environ.get(name)
 
-    @staticmethod
-    def setStaticMember(name,value):
+
+    def setStaticMember(self,name,value):
         '''
         设定直接输出变量，变量名必须注册于__Member__，否则抛出异常
         '''
-        if not __GLOBALENV.isMember(name):
+        if not self.isMember(name):
             raise AttributeError('OS Env have no attribute called {}'.format(name))
-        __GLOBALENV.__envStaticMember[name]=value
+        self.__envStaticMember[name]=value
+        logging.debug('set member:{} to {}'.format(name,str(value)))
         return
 
 

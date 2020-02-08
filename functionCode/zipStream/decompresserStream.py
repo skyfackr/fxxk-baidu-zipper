@@ -10,7 +10,10 @@ class decompresser(streamReaderMixiner):
     '''
     def __init__(self,file_object):
         self.__fileObj=file_object
-        self.__unzipper=pylzma.decompressobj(file_object)
+        try:
+            self.__file=file_object.read()
+        except AttributeError:
+            self.__file=file_object
         return
 
     def get(self):
@@ -21,7 +24,7 @@ class decompresser(streamReaderMixiner):
         '''
         logging.info('start compressing')
         start_time=time.time()
-        data=self._streamRead(self.__unzipper)
+        data=pylzma.decompress(self.__file)
         end_time=time.time()
         use_time=end_time-start_time
         logging.info('decompress complete,using time:{}'.format(use_time))
