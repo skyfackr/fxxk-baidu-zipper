@@ -9,7 +9,9 @@ class ossMiddleware(streamReaderMixiner):
     '''
     oss中间件
     '''
+    #__slots__=['errors','download','upload']
     class errors():
+        #__slots__=['DownloadError','UploadError']
         class DownloadError(Exception):
             pass
         class UploadError(Exception):
@@ -23,7 +25,7 @@ class ossMiddleware(streamReaderMixiner):
         self.__bucket=bucket
         self.__endpoint=endpoint
         auth=oss2.StsAuth(id,secret,token,auth_version=oss2.AUTH_VERSION_2)
-        oss2.set_stream_logger(level=logging.WARNING)
+        #oss2.set_stream_logger(level=logging.WARNING)
         self.__client=oss2.Bucket(auth,endpoint,bucket)
         logging.info('link oss complete,bucket:{},endpoint:{}'.format(bucket,endpoint))
         return

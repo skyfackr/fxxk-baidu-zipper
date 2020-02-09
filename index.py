@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import logging,json,sys,traceback
+import logging,json,sys,traceback,os
 from functionCode.mainfunc import mainfunc
 from functionCode.ossmiddleware import ossMiddleware
 from functionCode.globalEnvironmention import globalEnv
@@ -20,6 +20,7 @@ def init(context):
 
 
 def handler(event, context):
+  os.chdir('/tmp')
   logging.info('request arrived:'+json.dumps({
     'instanceID':globalEnv.instanceID,
     'requestID':context.requestId,

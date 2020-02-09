@@ -9,6 +9,7 @@ class compresser(streamReaderMixiner):
     '''
         流式压缩
         '''
+    #__slots__=['__init__','get']
     def __init__(self,file_object,fastBytes:int=int(globalEnv.fastBytes)):
         
         self.__fileObj=file_object

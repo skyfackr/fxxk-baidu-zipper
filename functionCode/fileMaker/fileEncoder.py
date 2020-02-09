@@ -5,8 +5,10 @@
 from .finallyFileEncoder import encoder
 from ..securityStream import AESEncryptStream
 from ..zipStream import compresser
-import logging,tempfile
+import logging,tempfile,gc
 from ..securityStream.mixin import fileLikeTranslationMixin
+from Crypto.Hash import SHA256
+from ..memoryLogger import log_mem
 
 def file_encode(data,password:str=None):
     '''
@@ -23,17 +25,30 @@ def file_encode(data,password:str=None):
     if password!=None:
         is_enc=True
     #压缩
+    gc.enable()
+    #gc.set_debug(gc.DEBUG_UNCOLLECTABLE)
+    gc.collect()
+    res_size=len(str(data))
+    res_sha=SHA256.new(data).hexdigest()
+    #log_mem()
     benc_data,compress_time=compresser(data).get()
+    #log_mem()
+    #logging.info('wait del')
+    del data
+    #logging.info('deled')
+    gc.collect()
+    #logging.info(gc.garbage)
+    #log_mem()
     if not is_enc:
         fin_data=benc_data
-        benc_data=None
+        benc_sha=None
+        del benc_data
     else:
-        tmp=tempfile.NamedTemporaryFile(mode='rb+')
-        tmp.write(data)
-        tmp.flush()
-        tmp.seek(0)
-        del data
+        benc_sha=SHA256.new(benc_data)
         gen=AESEncryptStream(benc_data,password).read()
         fin_data=gen.__next__()
-    all_data=encoder(fin_data,is_enc,tmp.read(),benc_data)
+        del benc_data
+        del password
+    gc.collect()
+    all_data=encoder(fin_data,is_enc,res_sha,res_size,benc_sha)
     return all_data,compress_time

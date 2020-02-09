@@ -6,21 +6,28 @@ from Crypto.Cipher import AES
 from Crypto import Random
 from Crypto.Hash import SHA256
 from .mixin import fileLikeTranslationMixin,AESPaddingMixin
-import base64,logging
+import base64,logging,gc
 class AESEncryptStream(fileLikeTranslationMixin,AESPaddingMixin):
     '''
     流式加密aes
     '''
     def __init__(self,data,password):
-        self.__data=data
+        #self.__data=data
         self.__pw=password
         self.__bs=AES.block_size
         self.__iv=Random.new().read(16)
-        enc_data=self._pkcs7_pad(base64.b64encode(self.__data))
+        b64data=base64.b64encode(data)
+        del data
+        gc.collect()
+        enc_data=self._pkcs7_pad(b64data)
+        del b64data
+        gc.collect()
         enc_password=SHA256.new(password.encode('utf-8')).hexdigest().encode()[:32]
         self.__secret=self.__iv+AES.new(enc_password,AES.MODE_CBC,self.__iv).encrypt(enc_data)
+        del enc_data
+        gc.collect()
         self._setFilelikeReading(self.__secret)
-        logging.info('encrypt data:{} complete with password:{}'.format(self.__data,self.__pw))
+        logging.info('encrypt data complete')
         return
 
 class AESDecryptStream(fileLikeTranslationMixin,AESPaddingMixin):

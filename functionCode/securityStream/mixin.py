@@ -3,13 +3,14 @@
 @des:各种mixin
 '''
 from Crypto.Cipher import AES
-import logging
+import logging,gc
 from goto import with_goto
 from ..ossmiddleware.streamReaderMixin import streamReaderMixiner
 class fileLikeTranslationMixin(streamReaderMixiner):
     '''
     用于将filelike完全读取或者将字符串转为filelike的mixin
     '''
+    
     def _setFilelikeReading(self,text:str):
         '''
         将字符串转为filelike
@@ -62,6 +63,7 @@ class AESPaddingMixin():
     '''
     用于aes的pad填充的mixin
     '''
+    
     def _pkcs7_pad(self,text):
         '''
         pkcs7填充
@@ -69,7 +71,10 @@ class AESPaddingMixin():
         blocksize=AES.block_size
         length=len(text)
         padding=blocksize-length%blocksize
-        return (text.decode()+padding*chr(padding)).encode()
+        text=text.decode()
+        gc.collect()
+        ans=text+padding*chr(padding)
+        return ans.encode()
 
     
     def _pkcs7_unpad(self,text):
