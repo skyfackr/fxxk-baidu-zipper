@@ -44,5 +44,5 @@ class AESDecryptStream(fileLikeTranslationMixin,AESPaddingMixin):
         #self.__ans=base64.b16decode(self._pkcs7_unpad(AES.new(dec_password,AES.MODE_CBC,self.__iv).decrypt(dec_data)))
         self.__ans=self._pkcs7_unpad(AES.new(dec_password,AES.MODE_CBC,self.__iv).decrypt(dec_data))
         self._setFilelikeReading(self.__ans)
-        logging.info('decrypt data:{} complete with password:{}'.format(data,password))
+        logging.info('decrypt  complete')
         return

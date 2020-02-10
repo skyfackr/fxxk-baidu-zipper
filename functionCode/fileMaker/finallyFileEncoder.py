@@ -3,7 +3,7 @@
 @des:将最终数据进行校验生成以及封装
 '''
 from Crypto.Hash import  SHA256
-import time,gc,logging
+import time,gc,logging,binascii
 from ..globalEnvironmention import globalEnv
 from ..securityStream import AESDecryptStream
 from ..zipStream import decompresser
@@ -26,13 +26,16 @@ def encoder(fin_data,isEncrypt:bool,res_sha,res_size,before_enc_data_sha=None):
     #logging.info('fin_data1 size:{}m'.format(str(round(len(fin_data)/1024/1024,3))))
     #测试结束
     #fin_data=str(fin_data)[2:-1]
-    fin_data=base64.b64encode(fin_data).decode()
+    #fin_data=base64.b64encode(fin_data).decode()
+    #fin_data=base64.b16encode(fin_data).decode()
+    #fin_data=binascii.b2a_hex(fin_data).decode()
     #测试代码
     #logging.info('fin_data2 size:{}m'.format(str(round(len(fin_data)/1024/1024,3))))
     #测试结束
     if isEncrypt and before_enc_data_sha==None:
         raise ValueError('before_enc_data_shamust be given if isEncrypt is True')
-    fin_sha=SHA256.new(fin_data.encode()).hexdigest()
+    #fin_sha=SHA256.new(fin_data.encode()).hexdigest()
+    fin_sha=SHA256.new(fin_data).hexdigest()
     #res_sha=SHA256.new(res_data).hexdigest()
     if isEncrypt:
         benc_sha=before_enc_data_sha
@@ -49,16 +52,17 @@ def encoder(fin_data,isEncrypt:bool,res_sha,res_size,before_enc_data_sha=None):
     is_enc=str(is_enc)
     header=ver+'|'+timestamp+'|'+res_size+'|'+fin_size+'|'+is_enc+'|'+benc_sha+'|'+fin_sha+'|'+res_sha
     
-    all_data=str(len(header))+'|'+header+'||'+fin_data
+    all_data=(str(len(header))+'|'+header+'||').encode()+fin_data
     del header,fin_data,ver,timestamp,res_size,fin_size,is_enc,benc_sha,fin_sha,res_sha
     gc.collect()
-    all_sha=SHA256.new(all_data.encode('utf-8')).hexdigest()
-    all_data=all_sha+'|'+all_data
+    #all_sha=SHA256.new(all_data.encode('utf-8')).hexdigest()
+    all_sha=SHA256.new(all_data).hexdigest().encode()
+    all_data=all_sha+'|'.encode()+all_data
     #all_data=all_data.encode()
     del all_sha
     gc.collect()
     #all_data=base64.b16encode(all_data.encode())
     #all_data=str(all_data)[2:-1]
-    all_data=all_data.encode()
+    #all_data=all_data.encode()
     return all_data
 

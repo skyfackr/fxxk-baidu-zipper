@@ -8,7 +8,7 @@ from ..globalEnvironmention import globalEnv
 from ..securityStream import AESDecryptStream
 from ..zipStream import decompresser
 from ..securityStream.mixin import fileLikeTranslationMixin
-import base64,logging
+import base64,logging,binascii
 from .numberTester import isNum
 class UnsupportError(Exception):
     pass
@@ -24,26 +24,28 @@ def decoder(all_data:bytes,password):
     #提取总校验
     try:
         #all_data=base64.b16decode(all_data).decode()
-        #pass
-        all_data=all_data.decode()
+        pass
+        #all_data=all_data.decode()
     except Exception:
         raise UnsupportError('1')
     sha256_size=64
-    if all_data[sha256_size]!='|':
+    #if all_data[sha256_size]!='|':
+    if all_data[sha256_size]!=ord('|'):
         raise UnsupportError('2')
-    all_sha=all_data[0:sha256_size]
+    all_sha=all_data[0:sha256_size].decode()
     all_data=all_data[sha256_size+1:]
-    if SHA256.new(all_data.encode('utf-8')).hexdigest()!=all_sha:
+    #if SHA256.new(all_data.encode('utf-8')).hexdigest()!=all_sha:
+    if SHA256.new(all_data).hexdigest()!=all_sha:
         raise VerificationError('3')
     #提取头
-    split_iter=all_data.find('|')
-    header_len=all_data[0:split_iter]
+    split_iter=all_data.find(ord('|'))
+    header_len=all_data[0:split_iter].decode()
     if not header_len.isdigit():
         raise UnsupportError('4')
     header_len=int(header_len)
-    header=all_data[split_iter+1:split_iter+1+header_len]
+    header=all_data[split_iter+1:split_iter+1+header_len].decode()
     #提取数据
-    if all_data[split_iter+1+header_len:split_iter+1+header_len+2]!='||':
+    if all_data[split_iter+1+header_len:split_iter+1+header_len+2]!='||'.encode():
         raise UnsupportError('5')
     fin_data=all_data[split_iter+1+header_len+2:]
     #解析头
@@ -86,10 +88,15 @@ def decoder(all_data:bytes,password):
     if fin_size!=len(fin_data):
         raise VerificationError('10')
     
-    if SHA256.new(fin_data.encode()).hexdigest()!=fin_sha:
+    #if SHA256.new(fin_data.encode()).hexdigest()!=fin_sha:
+    if SHA256.new(fin_data).hexdigest()!=fin_sha:
         raise VerificationError('11')
     try:
-        fin_data=base64.b64decode(fin_data.encode())
+        #fin_data=base64.b16decode(fin_data.encode())
+        #fin_data=base64.b64decode(fin_data.encode())
+        #fin_data=fin_data.encode()
+        #fin_data=binascii.a2b_hex(fin_data.encode())
+        pass
     except Exception:
         raise UnsupportError('17')
     #解密操作
@@ -97,6 +104,8 @@ def decoder(all_data:bytes,password):
     if is_enc:
         if benc_sha==None:
             raise UnsupportError('12')
+        if password==None:
+            raise VerificationError('13-0')
         try:
             gen=AESDecryptStream(fin_data,password).read()
         except Exception as e:
