@@ -22,7 +22,7 @@ class decompresser(streamReaderMixiner):
 
         'return'第一个为数据，第二个为时间
         '''
-        logging.info('start compressing')
+        logging.info('start decompressing')
         start_time=time.time()
         data=pylzma.decompress(self.__file)
         end_time=time.time()

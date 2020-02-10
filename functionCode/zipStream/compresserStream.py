@@ -30,7 +30,7 @@ class compresser(streamReaderMixiner):
         start_time=time.time()
         data=pylzma.compress(self.__file,fastBytes=self.__fb,eos=True)
         end_time=time.time()
-        logging.info('compress complete,use time:{}'.format(end_time-start_time))
+        logging.info('compress complete,use time:{},package size:{}m'.format(end_time-start_time,str(round(len(data)/1024/1024,3))))
         return data,end_time-start_time
 
 

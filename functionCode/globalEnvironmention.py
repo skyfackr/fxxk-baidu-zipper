@@ -21,7 +21,9 @@ class __GLOBALENV():
     'OSSMW',
     'instanceID',
     'OSSEndpoint',
-    'fastBytes']
+    'fastBytes',
+    'MaxCompressFileSizeWithMbytes',
+    'MaxDecompressFileSizeWithMbytes']
     #直接输出的常量名，若不在此字典则读取系统环境变量，要求名称必须在__Member__中
     __envStaticMember={}
     @classmethod

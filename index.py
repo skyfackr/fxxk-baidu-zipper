@@ -21,10 +21,26 @@ def init(context):
 
 def handler(event, context):
   os.chdir('/tmp')
+  try:
+    evt=json.loads(event)
+  except json.JSONDecodeError:
+    logging.warn('bad request:'+json.dumps({
+      'instanceID':globalEnv.instanceID,
+      'requestID':context.requestId,
+      'event':str(event)
+    }))
+    return json.dumps({
+      'success':False,
+      'msg':{
+        'errcode':'EventError',
+        'errmsg':'event error.please make sure it is currect json'
+      },
+      'uuid':context.requestId
+    },sort_keys=True)
   logging.info('request arrived:'+json.dumps({
     'instanceID':globalEnv.instanceID,
     'requestID':context.requestId,
-    'event':json.loads(event)
+    'event':evt
   }))
   try:
     ans=mainfunc(event,context)

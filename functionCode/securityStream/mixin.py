@@ -71,17 +71,19 @@ class AESPaddingMixin():
         blocksize=AES.block_size
         length=len(text)
         padding=blocksize-length%blocksize
-        text=text.decode()
+        #text=text.decode()
+        #text=str(text)[2:-1]
         gc.collect()
-        ans=text+padding*chr(padding)
-        return ans.encode()
+        ans=text+padding*chr(padding).encode()
+        return ans
 
     
     def _pkcs7_unpad(self,text):
         '''
         pkcs7解除填充
         '''
-        text=text.decode()
+        #text=text.decode()
         length=len(text)
-        unpadsize=ord(text[length-1])
+        #logging.info('last is {}'.format(text[length-1]))
+        unpadsize=text[length-1]
         return text[0:length-unpadsize]

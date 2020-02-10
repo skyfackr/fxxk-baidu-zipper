@@ -25,6 +25,8 @@ def decompress(download_path,upload_path,password=None):
         logging.warn('download error:'+str(e))
         return __failedReturnMaker('OSSDownloadError',str(e))
     logging.info('download {} complete.starting decoding file...'.format(download_path))
+    if round(len(all_data)/1024/1024)>int(globalEnv.MaxDecompressFileSizeWithMbytes):
+        return __failedReturnMaker('OutOfSizeError','your file size is to large({}m).system limit is {}m'.format(str(round(len(all_data)/1024/1024)),str(globalEnv.MaxDecompressFileSizeWithMbytes)))
     try:
         fin_data,is_enc,res_data,benc_data,time=decoder(all_data,password)
     except UnsupportError as e:
@@ -41,4 +43,4 @@ def decompress(download_path,upload_path,password=None):
         return __failedReturnMaker('OSSUploadError',str(e))
     logging.info('upload to {} complete'.format(upload_path))
     sha256=SHA256.new(res_data).hexdigest()
-    return __successReturnMaker(time,upload_path,sha256)
+    return __successReturnMaker(time,upload_path,sha256,len(res_data))

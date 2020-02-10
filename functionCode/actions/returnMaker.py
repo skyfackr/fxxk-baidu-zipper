@@ -15,15 +15,16 @@ def __failedReturnMaker(errcode,errmsg):
     }
 
 
-def __successReturnMaker(time,path,sha256):
+def __successReturnMaker(time,path,sha256,size):
     '''
     成功时返回成功信息
     '''
     return {
         'success':True,
         'msg':{
-            'time':int(time),
+            'time':str((time))+'s',
             'path':str(path),
-            'sha256':str(sha256)
+            'sha256':str(sha256),
+            'size':str(round(size/1024/1024,3))+'m'
         }
     }

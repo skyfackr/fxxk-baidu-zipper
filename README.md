@@ -61,3 +61,5 @@ FileTypeError:文件格式不受支持
 VerifactionError:验证失败
 ParameterError:参数错误
 UnknownError:未知错误
+EventError:输入指令格式错误
+OutOfSizeError:大小超出限制

@@ -4,7 +4,7 @@
 '''
 from ..globalEnvironmention import globalEnv
 from ..ossmiddleware import ossMiddleware
-import logging,json
+import logging,json,gc
 from ..fileMaker import encoder
 from Crypto.Hash import SHA256
 from .returnMaker import __failedReturnMaker,__successReturnMaker
@@ -25,6 +25,8 @@ def compress(download_path,upload_path,password=None):
         logging.warn('download error:'+str(e))
         return __failedReturnMaker('OSSDownloadError',str(e))
     logging.info('download {} complete.starting encoding file...'.format(download_path))
+    if round(len(res_data)/1024/1024)>int(globalEnv.MaxCompressFileSizeWithMbytes):
+        return __failedReturnMaker('OutOfSizeError','your file size is to large({}m).system limit is {}m'.format(str(round(len(res_data)/1024/1024)),str(globalEnv.MaxCompressFileSizeWithMbytes)))
     all_data,time=encoder(res_data,password=password)
     logging.info('encode {} complete.starting uploading to {}'.format(download_path,upload_path))
     try:
@@ -33,5 +35,9 @@ def compress(download_path,upload_path,password=None):
         logging.warn('upload error:'+str(e))
         return __failedReturnMaker('OSSUploadError',str(e))
     logging.info('upload to {} complete'.format(upload_path))
-    sha256=SHA256.new(all_data).hexdigest()
-    return __successReturnMaker(time,upload_path,sha256)
+    sha256=SHA256.new(all_data)
+    all_data_size=len(all_data)
+    del all_data
+    gc.collect()
+    sha256=sha256.hexdigest()
+    return __successReturnMaker(time,upload_path,sha256,all_data_size)

@@ -28,7 +28,7 @@ def file_encode(data,password:str=None):
     gc.enable()
     #gc.set_debug(gc.DEBUG_UNCOLLECTABLE)
     gc.collect()
-    res_size=len(str(data))
+    res_size=len(data)
     res_sha=SHA256.new(data).hexdigest()
     #log_mem()
     benc_data,compress_time=compresser(data).get()
@@ -44,7 +44,7 @@ def file_encode(data,password:str=None):
         benc_sha=None
         del benc_data
     else:
-        benc_sha=SHA256.new(benc_data)
+        benc_sha=SHA256.new(benc_data).hexdigest()
         gen=AESEncryptStream(benc_data,password).read()
         fin_data=gen.__next__()
         del benc_data

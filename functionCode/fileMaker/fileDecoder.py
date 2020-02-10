@@ -15,7 +15,7 @@ class UnsupportError(Exception):
 class VerificationError(Exception):
     pass
 
-def decoder(all_data:str,password):
+def decoder(all_data:bytes,password):
     '''
     解封装数据
 
@@ -23,7 +23,9 @@ def decoder(all_data:str,password):
     '''
     #提取总校验
     try:
-        all_data=base64.b64decode(all_data).decode()
+        #all_data=base64.b16decode(all_data).decode()
+        #pass
+        all_data=all_data.decode()
     except Exception:
         raise UnsupportError('1')
     sha256_size=64
@@ -86,7 +88,10 @@ def decoder(all_data:str,password):
     
     if SHA256.new(fin_data.encode()).hexdigest()!=fin_sha:
         raise VerificationError('11')
-    fin_data=base64.b64decode(fin_data.encode())
+    try:
+        fin_data=base64.b64decode(fin_data.encode())
+    except Exception:
+        raise UnsupportError('17')
     #解密操作
     before_enc_data=None
     if is_enc:
@@ -94,7 +99,8 @@ def decoder(all_data:str,password):
             raise UnsupportError('12')
         try:
             gen=AESDecryptStream(fin_data,password).read()
-        except Exception:
+        except Exception as e:
+            #logging.warn('error',exc_info=e)
             raise VerificationError('13-1')
         before_enc_data=gen.__next__()
         if SHA256.new(before_enc_data).hexdigest()!=benc_sha:
