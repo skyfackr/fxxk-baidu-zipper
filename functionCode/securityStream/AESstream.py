@@ -4,9 +4,10 @@
 '''
 from Crypto.Cipher import AES
 from Crypto import Random
-from Crypto.Hash import SHA256
+from Crypto.Hash import SHA256,MD5
 from .mixin import fileLikeTranslationMixin,AESPaddingMixin
 import base64,logging,gc
+from ..globalEnvironmention import globalEnv
 class AESEncryptStream(fileLikeTranslationMixin,AESPaddingMixin):
     '''
     流式加密aes
@@ -23,7 +24,9 @@ class AESEncryptStream(fileLikeTranslationMixin,AESPaddingMixin):
         enc_data=self._pkcs7_pad(b64data)
         del b64data
         gc.collect()
-        enc_password=SHA256.new(password.encode('utf-8')).hexdigest().encode()[:32]
+        for i in range(int(globalEnv.EncryptKeyMD5Times)):
+            password=MD5.new(password.encode('utf-8')).hexdigest()
+        enc_password=password.encode()
         self.__secret=self.__iv+AES.new(enc_password,AES.MODE_CBC,self.__iv).encrypt(enc_data)
         del enc_data
         gc.collect()
@@ -40,7 +43,9 @@ class AESDecryptStream(fileLikeTranslationMixin,AESPaddingMixin):
         #self.__pw=password
         self.__iv=data[0:16]
         dec_data=data[16:]
-        dec_password=SHA256.new(password.encode('utf-8')).hexdigest().encode()[:32]
+        for i in range(int(globalEnv.EncryptKeyMD5Times)):
+            password=MD5.new(password.encode('utf-8')).hexdigest()
+        dec_password=password.encode()
         #self.__ans=base64.b16decode(self._pkcs7_unpad(AES.new(dec_password,AES.MODE_CBC,self.__iv).decrypt(dec_data)))
         self.__ans=self._pkcs7_unpad(AES.new(dec_password,AES.MODE_CBC,self.__iv).decrypt(dec_data))
         self._setFilelikeReading(self.__ans)
